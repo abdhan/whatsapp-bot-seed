@@ -63,3 +63,7 @@ session_db_path = "/tmp/sessions.db"
 # If logging_level set to logging.DEBUG, yowsup will log every protocoll message exchange with server.
 log_format = '_%(filename)s_\t[%(levelname)s][%(asctime)-15s] %(message)s'
 logging_level = logging.INFO
+
+# Profile settings
+profile_picture_path = "/path/to/image/image.jpeg"
+status_message = "Send /help for the commands list."
