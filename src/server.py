@@ -11,9 +11,11 @@ from yowsup.layers import YowLayerEvent, YowParallelLayer
 from yowsup.layers.auth import AuthError
 from yowsup.layers.network import YowNetworkLayer
 from yowsup.stacks.yowstack import YowStackBuilder
-
+from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
+from yowsup.layers.protocol_profiles.protocolentities import *
 from layers.notifications.notification_layer import NotificationsLayer
 from router import RouteLayer
+from PIL import Image
 
 
 class YowsupEchoStack(object):
@@ -27,6 +29,18 @@ class YowsupEchoStack(object):
         stack_builder.push(YowParallelLayer([RouteLayer, NotificationsLayer]))
         self.stack = stack_builder.build()
         self.stack.setCredentials(credentials)
+        
+        # Set profile picture
+        src = Image.open(config.profile_picture)
+        pictureData = src.resize((640, 640)).tobytes("jpeg", "RGB")
+        picturePreview = src.resize((96, 96)).tobytes("jpeg", "RGB")
+        iq = SetPictureIqProtocolEntity(self.getOwnJid(), picturePreview, pictureData)
+        self._sendIq(iq, UpdateProfilePictureSuccess, UpdateProfilePictureError)
+        
+        # Set status message
+        entity = SetStatusIqProtocolEntity(config.status_message)
+        self._sendIq(entity, UpdateStatusMessageSuccess, UpdateStatusMessageError)
+        
 
     def start(self):
         "Starts the connection with Whatsapp servers,"
@@ -43,6 +57,17 @@ class YowsupEchoStack(object):
         except Exception as e:
             logging.exception("Unexpected Exception: %s" % e.message)
 
+    def UpdateStatusMessageSuccess(resultIqEntity, originalIqEntity):
+        logging.info("Status updated successfully")
+
+    def UpdateStatusMessageError(errorIqEntity, originalIqEntity):
+        logging.error("Error updating status")
+        
+    def UpdateProfilePictureSuccess(resultIqEntity, originalIqEntity):
+        logging.info("Profile picture updated successfully")
+
+    def UpdateProfilePictureError(errorIqEntity, originalIqEntity):
+        logging.error("Error updating profile picture")
 
 if __name__ == "__main__":
     import sys
