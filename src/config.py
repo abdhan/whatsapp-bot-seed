@@ -65,5 +65,5 @@ log_format = '_%(filename)s_\t[%(levelname)s][%(asctime)-15s] %(message)s'
 logging_level = logging.INFO
 
 # Profile settings
-profile_picture_path = "/path/to/image/image.jpeg"
+profile_picture = "/path/to/image/foo.jpeg"
 status_message = "Send /help for the commands list."
